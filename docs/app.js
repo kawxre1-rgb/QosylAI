@@ -1,4 +1,4 @@
-const API_URL = "/api";
+const API_URL = "https://qosylai.onrender.com/api";
 
 let currentUserProfile = null;
 let currentUserId = Number(localStorage.getItem("qosylUserId")) || null;
