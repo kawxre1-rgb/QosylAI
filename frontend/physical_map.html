@@ -1,0 +1,459 @@
+
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QOSYL AI — Live Map</title>
+<style>
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    padding: 25px;
+    font-family: Arial, sans-serif;
+    background: #f3f6fb;
+    color: #172033;
+}
+header { margin-bottom: 22px; }
+header h1 { margin-bottom: 7px; }
+header p { color: #718096; }
+.controls {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+select, button {
+    padding: 11px 15px;
+    border: 1px solid #d8e0eb;
+    border-radius: 9px;
+    background: white;
+    cursor: pointer;
+}
+button.primary {
+    background: #2563eb;
+    color: white;
+    border: none;
+}
+.layout {
+    display: grid;
+    grid-template-columns: 1fr 260px;
+    gap: 18px;
+}
+.map {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1000 / 650;
+    min-height: 420px;
+    overflow: hidden;
+    border: 1px solid #dce3ed;
+    border-radius: 18px;
+    background:
+      linear-gradient(#e9eef5 1px, transparent 1px),
+      linear-gradient(90deg, #e9eef5 1px, transparent 1px),
+      white;
+    background-size: 30px 30px;
+}
+.corridor {
+    position: absolute;
+    background: #e5eaf1;
+    border: 1px solid #d4dce8;
+    border-radius: 12px;
+}
+.booth {
+    position: absolute;
+    transform: translate(-50%,-50%);
+    width: 19%;
+    min-height: 65px;
+    border: 2px solid #cbd5e1;
+    border-radius: 12px;
+    background: white;
+    z-index: 2;
+    font-weight: bold;
+    font-size: clamp(9px,1.1vw,13px);
+    text-align: center;
+    padding: 5px;
+}
+.booth span { display: block; font-size: 22px; }
+.rest {
+    position: absolute;
+    left: 39%;
+    top: 76%;
+    width: 22%;
+    height: 11%;
+    background: #dff3ff;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    color: #075985;
+    font-size: 12px;
+    font-weight: bold;
+    z-index: 2;
+}
+.entrance {
+    position: absolute;
+    left: 43%;
+    top: 91%;
+    width: 14%;
+    text-align: center;
+    font-weight: bold;
+    font-size: 12px;
+}
+.marker {
+    position: absolute;
+    transform: translate(-50%,-50%);
+    width: 36px;
+    height: 36px;
+    border: 3px solid white;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    color: white;
+    font-weight: bold;
+    z-index: 5;
+    cursor: pointer;
+    box-shadow: 0 2px 8px #0003;
+}
+.marker.me { background: #2563eb; }
+.marker.other { background: #16a34a; }
+.marker.selected { outline: 4px solid #86efac; }
+#route {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 4;
+    pointer-events: none;
+}
+.panel {
+    background: white;
+    border: 1px solid #e1e7ef;
+    border-radius: 15px;
+    padding: 18px;
+}
+.person {
+    padding: 13px 5px;
+    border-bottom: 1px solid #edf0f5;
+    cursor: pointer;
+}
+.person:hover { background: #f5f8fc; }
+.person small { display: block; color: #718096; margin-top: 5px; }
+#status {
+    margin-top: 15px;
+    padding: 12px;
+    background: #eaf1ff;
+    border-radius: 9px;
+    font-size: 13px;
+}
+@media(max-width:850px) {
+    .layout { grid-template-columns: 1fr; }
+    body { padding: 12px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+    <h1>📍 QOSYL AI — Event Live Map</h1>
+    <p>Іс-шарадағы адамдарды тауып, кездесуге арналған маршрут құрыңыз.</p>
+</header>
+
+<div class="controls">
+    <select id="personSelect">
+        <option value="1">Мерей</option>
+        <option value="2">Айбек</option>
+    </select>
+
+    <select id="boothSelect">
+        <option value="1">AI & Machine Learning</option>
+        <option value="2">Startup & Innovation</option>
+        <option value="3">Career & IT Jobs</option>
+        <option value="4">Robotics & Engineering</option>
+        <option value="5">Web & Digital Technologies</option>
+        <option value="6">Education & Mentorship</option>
+    </select>
+
+    <button class="primary" onclick="updatePosition()">Орнымды белгілеу</button>
+    <button onclick="clearRoute()">Маршрутты тазалау</button>
+</div>
+
+<div class="layout">
+    <div>
+        <div class="map" id="map">
+
+            <div class="corridor" style="left:47%;top:78%;width:6%;height:14%"></div>
+            <div class="corridor" style="left:47%;top:63%;width:6%;height:17%"></div>
+            <div class="corridor" style="left:22%;top:63%;width:56%;height:6%"></div>
+            <div class="corridor" style="left:22%;top:44%;width:6%;height:22%"></div>
+            <div class="corridor" style="left:72%;top:44%;width:6%;height:22%"></div>
+            <div class="corridor" style="left:22%;top:28%;width:56%;height:6%"></div>
+            <div class="corridor" style="left:47%;top:25%;width:6%;height:10%"></div>
+
+            <div class="booth" style="left:25%;top:34%">
+                <span>🧠</span>AI & Machine Learning
+            </div>
+            <div class="booth" style="left:75%;top:34%">
+                <span>🚀</span>Startup & Innovation
+            </div>
+            <div class="booth" style="left:25%;top:57%">
+                <span>💼</span>Career & IT Jobs
+            </div>
+            <div class="booth" style="left:75%;top:57%">
+                <span>🤖</span>Robotics & Engineering
+            </div>
+            <div class="booth" style="left:40%;top:17%">
+                <span>💻</span>Web & Digital Technologies
+            </div>
+            <div class="booth" style="left:60%;top:17%">
+                <span>🎓</span>Education & Mentorship
+            </div>
+
+            <div class="rest">☕ REST / NETWORKING</div>
+            <div class="entrance">⬇ ENTRANCE</div>
+
+            <svg id="route" viewBox="0 0 1000 650" preserveAspectRatio="none">
+                <polyline id="routeLine"
+                    points=""
+                    fill="none"
+                    stroke="#2563eb"
+                    stroke-width="9"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-dasharray="14 9"/>
+            </svg>
+
+            <div id="markers"></div>
+        </div>
+        <div id="status">Қатысушыны таңдап, картадағы орнын белгілеңіз.</div>
+    </div>
+
+    <aside class="panel">
+        <h3>Қатысушылар</h3>
+        <div id="people"></div>
+        <hr>
+        <h3>Карта туралы</h3>
+        <p>🔵 Көк — сіз</p>
+        <p>🟢 Жасыл — басқа қатысушы</p>
+        <p>🔷 Көк сызық — маршрут</p>
+    </aside>
+</div>
+
+<script>
+const booths = [
+    {id:1,name:"AI & Machine Learning",x:250,y:220},
+    {id:2,name:"Startup & Innovation",x:750,y:220},
+    {id:3,name:"Career & IT Jobs",x:250,y:370},
+    {id:4,name:"Robotics & Engineering",x:750,y:370},
+    {id:5,name:"Web & Digital Technologies",x:400,y:110},
+    {id:6,name:"Education & Mentorship",x:600,y:110}
+];
+
+const users = {
+    1:{id:1,name:"Мерей",role:"Informatics student",x:250,y:220},
+    2:{id:2,name:"Айбек",role:"Robotics enthusiast",x:750,y:370}
+};
+
+const nodes = {
+    entrance:[500,600],
+    bottom:[500,520],
+    center:[500,420],
+    left:[250,420],
+    right:[750,420],
+    leftTop:[250,300],
+    rightTop:[750,300],
+    upperLeft:[400,180],
+    upperRight:[600,180],
+    upper:[500,180]
+};
+
+const edges = [
+    ["entrance","bottom"],
+    ["bottom","center"],
+    ["center","left"],
+    ["center","right"],
+    ["left","leftTop"],
+    ["right","rightTop"],
+    ["leftTop","upperLeft"],
+    ["rightTop","upperRight"],
+    ["upperLeft","upper"],
+    ["upperRight","upper"],
+    ["upperLeft","upperRight"]
+];
+
+let selectedTarget = null;
+
+function currentUser() {
+    return Number(document.getElementById("personSelect").value);
+}
+
+function updatePosition() {
+    const user = users[currentUser()];
+    const booth = booths.find(
+        b => b.id === Number(document.getElementById("boothSelect").value)
+    );
+
+    user.x = booth.x;
+    user.y = booth.y;
+
+    render();
+    document.getElementById("status").textContent =
+        `${user.name}: ${booth.name} аймағында.`;
+}
+
+function render() {
+    const markers = document.getElementById("markers");
+    const people = document.getElementById("people");
+
+    markers.innerHTML = "";
+    people.innerHTML = "";
+
+    Object.values(users).forEach(user => {
+        const marker = document.createElement("button");
+        marker.className = "marker " +
+            (user.id === currentUser() ? "me" : "other") +
+            (selectedTarget === user.id ? " selected" : "");
+
+        marker.style.left = user.x / 10 + "%";
+        marker.style.top = user.y / 6.5 + "%";
+        marker.textContent = user.id === 1 ? "М" : "А";
+        marker.title = user.name;
+
+        if (user.id !== currentUser()) {
+            marker.onclick = () => showRoute(user.id);
+        }
+
+        markers.appendChild(marker);
+
+        const item = document.createElement("div");
+        item.className = "person";
+
+        const name = document.createElement("strong");
+        name.textContent = user.name;
+
+        const role = document.createElement("small");
+        role.textContent = user.role;
+
+        const location = document.createElement("small");
+        const nearest = booths.reduce((a,b) =>
+            Math.hypot(a.x-user.x,a.y-user.y) <
+            Math.hypot(b.x-user.x,b.y-user.y) ? a : b
+        );
+        location.textContent = nearest.name;
+
+        item.append(name,role,location);
+
+        if (user.id !== currentUser()) {
+            item.onclick = () => showRoute(user.id);
+        }
+
+        people.appendChild(item);
+    });
+}
+
+function nearestNode(x,y) {
+    return Object.keys(nodes).reduce((best,key) => {
+        const p = nodes[key];
+        const d = Math.hypot(p[0]-x,p[1]-y);
+        return d < best.d ? {key,d} : best;
+    },{key:null,d:Infinity}).key;
+}
+
+function shortestPath(start,end) {
+    const graph = {};
+
+    Object.keys(nodes).forEach(key => graph[key]=[]);
+
+    edges.forEach(([a,b]) => {
+        const d = Math.hypot(
+            nodes[a][0]-nodes[b][0],
+            nodes[a][1]-nodes[b][1]
+        );
+        graph[a].push([b,d]);
+        graph[b].push([a,d]);
+    });
+
+    const dist = {};
+    const prev = {};
+    const remaining = new Set(Object.keys(nodes));
+
+    Object.keys(nodes).forEach(key => dist[key]=Infinity);
+    dist[start]=0;
+
+    while (remaining.size) {
+        let current = null;
+
+        remaining.forEach(key => {
+            if (current === null || dist[key] < dist[current]) {
+                current = key;
+            }
+        });
+
+        if (current === null || dist[current] === Infinity) break;
+        if (current === end) break;
+
+        remaining.delete(current);
+
+        graph[current].forEach(([next,cost]) => {
+            const alt = dist[current]+cost;
+            if (alt < dist[next]) {
+                dist[next]=alt;
+                prev[next]=current;
+            }
+        });
+    }
+
+    const path=[];
+    let current=end;
+
+    while(current) {
+        path.unshift(current);
+        current=prev[current];
+    }
+
+    return path[0] === start ? path : [];
+}
+
+function showRoute(targetId) {
+    const me = users[currentUser()];
+    const target = users[targetId];
+
+    const start = nearestNode(me.x,me.y);
+    const end = nearestNode(target.x,target.y);
+
+    const path = shortestPath(start,end);
+
+    if (!path.length) return;
+
+    const points = [
+        [me.x,me.y],
+        ...path.map(key=>nodes[key]),
+        [target.x,target.y]
+    ];
+
+    document.getElementById("routeLine").setAttribute(
+        "points",
+        points.map(p=>p.join(",")).join(" ")
+    );
+
+    selectedTarget=targetId;
+    render();
+
+    document.getElementById("status").textContent =
+        `${me.name} → ${target.name}: маршрут көрсетілді.`;
+}
+
+function clearRoute() {
+    selectedTarget=null;
+    document.getElementById("routeLine").setAttribute("points","");
+    render();
+    document.getElementById("status").textContent="Маршрут тазаланды.";
+}
+
+document.getElementById("personSelect").addEventListener("change",()=>{
+    clearRoute();
+});
+
+render();
+</script>
+</body>
+</html>

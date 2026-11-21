@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QOSYL AI — Smart Networking</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="app-shell">
+
+    <aside class="sidebar">
+        <a href="#" class="logo" onclick="showPage('home');return false;">
+            QOSYL<span>AI</span>
+        </a>
+
+        <div class="sidebar-profile">
+            <div class="profile-avatar" id="sidebarAvatar">Q</div>
+            <div>
+                <strong id="sidebarName">Guest User</strong>
+                <small id="sidebarRole">Networking member</small>
+            </div>
+        </div>
+
+        <div class="sidebar-label">MENU</div>
+
+        <nav class="side-nav">
+            <button class="nav-item active" data-page="home" onclick="showPage('home')">
+                <i class="fa-solid fa-house"></i>
+                <span data-i18n="navHome">Басты бет</span>
+            </button>
+
+            <button class="nav-item" data-page="discover" onclick="showPage('discover')">
+                <i class="fa-solid fa-users"></i>
+                <span data-i18n="navDiscover">AI ұсыныстары</span>
+            </button>
+
+            <button class="nav-item" data-page="chats" onclick="showPage('chats')">
+                <i class="fa-regular fa-comment-dots"></i>
+                <span data-i18n="navChats">Чаттар</span>
+            </button>
+
+            <button class="nav-item" data-page="notifications" onclick="showPage('notifications')">
+                <i class="fa-regular fa-bell"></i>
+                <span data-i18n="navNotifications">Сұраныстар</span>
+                <span class="nav-count" id="notificationCount">0</span>
+            </button>
+
+            <button class="nav-item" data-page="profilePage" onclick="showPage('profilePage')">
+                <i class="fa-regular fa-user"></i>
+                <span data-i18n="navProfile">Менің профилім</span>
+            </button>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <div class="language-selector">
+                <i class="fa-solid fa-globe"></i>
+                <select id="languageSelect" onchange="changeLanguage(this.value)">
+                    <option value="kk">Қазақша</option>
+                    <option value="ru">Русский</option>
+                    <option value="en">English</option>
+                </select>
+            </div>
+
+            <button class="nav-item logout-button" onclick="logoutUser()">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span data-i18n="logout">Шығу</span>
+            </button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+
+        <header class="topbar">
+            <div>
+                <div class="topbar-date" id="currentDate"></div>
+                <h2 id="pageHeading">Басты бет</h2>
+            </div>
+
+            <div class="topbar-right">
+                <button class="icon-button" onclick="showPage('notifications')" title="Notifications">
+                    <i class="fa-regular fa-bell"></i>
+                    <span class="notification-dot" id="topNotificationDot"></span>
+                </button>
+
+                <button class="topbar-user" onclick="showPage('profilePage')">
+                    <div class="small-avatar" id="topAvatar">Q</div>
+                    <span id="topUserName">Guest</span>
+                    <i class="fa-solid fa-chevron-down"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- HOME PAGE -->
+        <section class="page active" id="home">
+
+            <div class="welcome-banner">
+                <div class="welcome-content">
+                    <span class="eyebrow">AI POWERED NETWORKING</span>
+                    <h1 data-i18n="welcomeTitle">Дұрыс адамдармен танысыңыз.</h1>
+                    <p data-i18n="welcomeText">
+                        QOSYL AI сізге кәсіби мақсаттарыңызға сәйкес келетін адамдарды табуға көмектеседі.
+                    </p>
+                    <button class="primary-button" onclick="showPage('discover')">
+                        <span data-i18n="heroButton">Таныстықты бастау</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+
+                <div class="welcome-art">
+                    <div class="art-circle">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                    <div class="art-bubble bubble-one">
+                        <i class="fa-solid fa-check"></i> AI Matching
+                    </div>
+                    <div class="art-bubble bubble-two">
+                        <i class="fa-solid fa-bolt"></i> Smart Networking
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon purple-icon"><i class="fa-solid fa-users"></i></div>
+                    <div>
+                        <span data-i18n="statParticipants">Қатысушылар</span>
+                        <strong id="totalParticipants">120+</strong>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon blue-icon"><i class="fa-solid fa-user-group"></i></div>
+                    <div>
+                        <span data-i18n="statConnections">Байланыстарым</span>
+                        <strong id="totalConnections">0</strong>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon pink-icon"><i class="fa-regular fa-message"></i></div>
+                    <div>
+                        <span data-i18n="statRequests">Келген сұраныстар</span>
+                        <strong id="totalRequests">0</strong>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon green-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                    <div>
+                        <span data-i18n="statAI">AI ұсыныстары</span>
+                        <strong>Top 5</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-heading">
+                <div>
+                    <h2 data-i18n="quickActions">Жылдам әрекеттер</h2>
+                    <p data-i18n="quickActionsText">QOSYL AI мүмкіндіктерін пайдаланыңыз.</p>
+                </div>
+            </div>
+
+            <div class="quick-grid">
+                <button class="quick-card" onclick="showPage('discover')">
+                    <div class="quick-icon purple-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                    <strong data-i18n="quickDiscover">AI арқылы адам табу</strong>
+                    <small data-i18n="quickDiscoverText">Сізге сәйкес қатысушыларды табыңыз</small>
+                    <i class="fa-solid fa-arrow-right quick-arrow"></i>
+                </button>
+
+                <button class="quick-card" onclick="showPage('chats')">
+                    <div class="quick-icon blue-icon"><i class="fa-regular fa-comments"></i></div>
+                    <strong data-i18n="quickChats">Чаттарға өту</strong>
+                    <small data-i18n="quickChatsText">Байланыстарыңызбен сөйлесіңіз</small>
+                    <i class="fa-solid fa-arrow-right quick-arrow"></i>
+                </button>
+
+                <button class="quick-card" onclick="showPage('profilePage')">
+                    <div class="quick-icon pink-icon"><i class="fa-regular fa-id-card"></i></div>
+                    <strong data-i18n="quickProfile">Профильді өңдеу</strong>
+                    <small data-i18n="quickProfileText">Өзіңіз туралы ақпаратты жаңартыңыз</small>
+                    <i class="fa-solid fa-arrow-right quick-arrow"></i>
+                </button>
+            </div>
+
+            <div class="content-heading">
+                <div>
+                    <h2 data-i18n="howTitle">QOSYL AI қалай жұмыс істейді?</h2>
+                    <p data-i18n="howText">Үш қарапайым қадам арқылы пайдалы байланыстар орнатыңыз.</p>
+                </div>
+            </div>
+
+            <div class="steps-grid">
+                <article class="step-card">
+                    <span>01</span>
+                    <i class="fa-regular fa-user"></i>
+                    <h3 data-i18n="step1Title">Профиль толтырыңыз</h3>
+                    <p data-i18n="step1Text">Рөліңізді, дағдыларыңызды және мақсатыңызды көрсетіңіз.</p>
+                </article>
+
+                <article class="step-card">
+                    <span>02</span>
+                    <i class="fa-solid fa-brain"></i>
+                    <h3 data-i18n="step2Title">AI сәйкестендіреді</h3>
+                    <p data-i18n="step2Text">Жүйе сізге сәйкес келетін қатысушыларды анықтайды.</p>
+                </article>
+
+                <article class="step-card">
+                    <span>03</span>
+                    <i class="fa-solid fa-handshake"></i>
+                    <h3 data-i18n="step3Title">Байланыс орнатыңыз</h3>
+                    <p data-i18n="step3Text">Сұраныс жіберіп, жеке чатта сөйлесіңіз.</p>
+                </article>
+            </div>
+        </section>
+
+        <!-- DISCOVER PAGE -->
+        <section class="page hidden" id="discover">
+
+            <div class="page-intro">
+                <span class="eyebrow">AI SMART MATCHING</span>
+                <h1 data-i18n="discoverTitle">Сізге сәйкес адамдар</h1>
+                <p data-i18n="discoverText">Профиліңізге сәйкес ең үздік бес қатысушыны табыңыз.</p>
+            </div>
+
+            <div class="discover-layout">
+
+                <div class="profile-form-card" id="profile">
+                    <div class="card-heading">
+                        <h2 data-i18n="profileTitle">Өзіңіз туралы айтып беріңіз</h2>
+                        <p data-i18n="profileText">Жеке ұсыныстар алу үшін анкетаны толтырыңыз.</p>
+                    </div>
+
+                    <form id="profileForm">
+                        <div class="form-grid">
+
+                            <div class="field">
+                                <label for="name" data-i18n="nameLabel">Аты-жөніңіз</label>
+                                <input id="name" type="text" placeholder="Мысалы: Merey V." required>
+                            </div>
+
+                            <div class="field">
+                                <label for="role" data-i18n="roleLabel">Сіздің рөліңіз</label>
+                                <select id="role" required>
+                                    <option value="" data-i18n="selectOption">Таңдаңыз</option>
+                                    <option>Student</option>
+                                    <option>Junior Developer</option>
+                                    <option>Python Developer</option>
+                                    <option>Frontend Developer</option>
+                                    <option>Senior Developer</option>
+                                    <option>HR Manager</option>
+                                    <option>IT Recruiter</option>
+                                    <option>Team Lead</option>
+                                    <option>Startup Founder</option>
+                                    <option>Product Manager</option>
+                                    <option>AI Engineer</option>
+                                    <option>Designer</option>
+                                </select>
+                            </div>
+
+                            <div class="field">
+                                <label for="skills" data-i18n="skillsLabel">Технологиялық дағдылар</label>
+                                <input id="skills" type="text" placeholder="Python, HTML, CSS" required>
+                                <small data-i18n="commaHint">Үтір арқылы бөліп жазыңыз.</small>
+                            </div>
+
+                            <div class="field">
+                                <label for="experience" data-i18n="experienceLabel">Тәжірибеңіз</label>
+                                <select id="experience" required>
+                                    <option value="" data-i18n="selectOption">Таңдаңыз</option>
+                                    <option>Beginner</option>
+                                    <option>Less than 1 year</option>
+                                    <option>1-3 years</option>
+                                    <option>3-5 years</option>
+                                    <option>5+ years</option>
+                                </select>
+                            </div>
+
+                            <div class="field full">
+                                <label for="interests" data-i18n="interestsLabel">Қызығушылықтарыңыз</label>
+                                <input id="interests" type="text" placeholder="AI, Robotics, Web Development" required>
+                            </div>
+
+                            <div class="field full">
+                                <label for="about" data-i18n="aboutLabel">Өзіңіз туралы</label>
+                                <textarea id="about" rows="3" placeholder="Өзіңізді қысқаша таныстырыңыз..." required></textarea>
+                            </div>
+
+                            <div class="field full">
+                                <label for="goal" data-i18n="goalLabel">Негізгі мақсатыңыз</label>
+                                <select id="goal" required>
+                                    <option value="" data-i18n="goalOption">Мақсатты таңдаңыз</option>
+                                    <option value="find_job" data-i18n="goalFindJob">Жұмыс табу</option>
+                                    <option value="hire" data-i18n="goalHire">Қызметкер жалдау</option>
+                                    <option value="find_mentor" data-i18n="goalFindMentor">Ментор табу</option>
+                                    <option value="become_mentor" data-i18n="goalBecomeMentor">Ментор болу</option>
+                                    <option value="cofounder" data-i18n="goalCofounder">Ко-фаундер табу</option>
+                                    <option value="exchange" data-i18n="goalExchange">Тәжірибе алмасу</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="primary-button submit-button" data-i18n="findButton">
+                            Маған сәйкес адамдарды тап
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+
+                        <p id="formError" class="error-message"></p>
+                    </form>
+                </div>
+
+                <div class="matches-area">
+                    <div class="content-heading">
+                        <div>
+                            <h2 data-i18n="resultsTitle">AI ұсыныстары</h2>
+                            <p id="resultSubtitle" data-i18n="resultsText">Жеке ұсыныстарыңыз осы жерде көрсетіледі.</p>
+                        </div>
+                    </div>
+
+                    <div id="matchList" class="match-list">
+                        <div class="empty-state">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            <h3 data-i18n="emptyMatchesTitle">Әзірге ұсыныстар жоқ</h3>
+                            <p data-i18n="emptyMatchesText">Анкетаны толтырып, AI ұсыныстарын алыңыз.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CHATS PAGE -->
+        <section class="page hidden" id="chats">
+            <div class="page-intro">
+                <span class="eyebrow">YOUR NETWORK</span>
+                <h1 data-i18n="chatsTitle">Жеке чаттар</h1>
+                <p data-i18n="chatsText">Қабылданған байланыстарыңызбен сөйлесіңіз.</p>
+            </div>
+
+            <div class="messenger-layout">
+                <div class="chat-list-panel">
+                    <div class="chat-list-heading">
+                        <h3 data-i18n="messages">Хабарламалар</h3>
+                        <button class="icon-button" onclick="loadConnections()">
+                            <i class="fa-solid fa-rotate"></i>
+                        </button>
+                    </div>
+                    <div id="chatList" class="chat-list">
+                        <div class="empty-state">
+                            <i class="fa-regular fa-comments"></i>
+                            <p data-i18n="noConnections">Әзірге чаттар жоқ.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chat-conversation" id="chatConversation">
+                    <div class="chat-placeholder">
+                        <i class="fa-regular fa-message"></i>
+                        <h3 data-i18n="selectChat">Чатты таңдаңыз</h3>
+                        <p data-i18n="selectChatText">Хабарламаларды көру үшін сол жақтан қатысушыны таңдаңыз.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- NOTIFICATIONS PAGE -->
+        <section class="page hidden" id="notifications">
+            <div class="page-intro">
+                <span class="eyebrow">CONNECTION REQUESTS</span>
+                <h1 data-i18n="notificationsTitle">Келген сұраныстар</h1>
+                <p data-i18n="notificationsText">Сізбен танысқысы келетін қатысушылар.</p>
+            </div>
+
+            <div class="requests-card">
+                <div class="card-heading">
+                    <h2 data-i18n="incomingRequests">Кіріс сұраныстары</h2>
+                    <button class="secondary-button small-button" onclick="loadPendingRequests()">
+                        <i class="fa-solid fa-rotate"></i>
+                        <span data-i18n="refresh">Жаңарту</span>
+                    </button>
+                </div>
+
+                <div id="pendingRequestsList" class="requests-list">
+                    <div class="empty-state">
+                        <i class="fa-regular fa-bell"></i>
+                        <p data-i18n="noRequests">Әзірге жаңа сұраныс жоқ.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PROFILE PAGE -->
+        <section class="page hidden" id="profilePage">
+            <div class="page-intro">
+                <span class="eyebrow">MY ACCOUNT</span>
+                <h1 data-i18n="myProfile">Менің профилім</h1>
+                <p data-i18n="myProfileText">Жеке ақпаратыңыз бен кәсіби дағдыларыңыз.</p>
+            </div>
+
+            <div class="user-profile-card">
+                <div class="user-profile-cover"></div>
+
+                <div class="user-profile-main">
+                    <div class="large-avatar" id="profileAvatar">Q</div>
+                    <div class="profile-user-info">
+                        <h2 id="profileName">Guest User</h2>
+                        <p id="profileRole">Networking member</p>
+                    </div>
+                </div>
+
+                <div class="profile-details">
+                    <div class="detail-item">
+                        <span data-i18n="skillsLabel">Дағдылар</span>
+                        <strong id="profileSkills">—</strong>
+                    </div>
+
+                    <div class="detail-item">
+                        <span data-i18n="experienceLabel">Тәжірибе</span>
+                        <strong id="profileExperience">—</strong>
+                    </div>
+
+                    <div class="detail-item">
+                        <span data-i18n="interestsLabel">Қызығушылықтары</span>
+                        <strong id="profileInterests">—</strong>
+                    </div>
+
+                    <div class="detail-item">
+                        <span data-i18n="goalLabel">Мақсаты</span>
+                        <strong id="profileGoal">—</strong>
+                    </div>
+
+                    <div class="detail-item full">
+                        <span data-i18n="aboutLabel">Өзі туралы</span>
+                        <strong id="profileAbout">—</strong>
+                    </div>
+                </div>
+
+                <button class="primary-button" onclick="editProfile()" data-i18n="editProfile">
+                    Профильді өңдеу
+                    <i class="fa-solid fa-pen"></i>
+                </button>
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
